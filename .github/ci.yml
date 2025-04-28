@@ -1,0 +1,30 @@
+name: Docker React App CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 레포지토리 체크아웃
+      - uses: actions/checkout@v3
+
+      # Docker 빌드
+      - name: Build Docker image
+        run: |
+          echo "Start creating an image with dockerfile..."
+          docker build -t msg/docker-react-app -f Dockerfile.dev .
+
+      # 도커 컨테이너에서 테스트 실행
+      - name: Run tests in Docker
+        run: |
+          docker run -e CI=true msg/docker-react-app npm run test -- --coverage
+
+      # 테스트 성공 후 로그
+      - name: Test Success
+        run: echo "Test success"
